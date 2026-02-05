@@ -1,0 +1,306 @@
+<%- include('layout', { currentPath: '/plugins' }) %>
+
+<div class="container">
+    <% if (!plugin) { %>
+        <div style="text-align: center; padding: 6rem 0;">
+            <h1>Plugin Not Found</h1>
+            <p style="color: var(--gray); margin: 1rem 0;">
+                The plugin you're looking for doesn't exist or has been removed.
+            </p>
+            <a href="/plugins" class="btn btn-primary">
+                Back to Plugins
+            </a>
+        </div>
+    <% } else { %>
+        <!-- Plugin Header -->
+        <div style="margin: 2rem 0 3rem;">
+            <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1rem;">
+                <span style="font-size: 3rem;"><%= plugin.icon || '🧩' %></span>
+                <div>
+                    <h1 style="margin: 0;"><%= plugin.name %></h1>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                        <% if (plugin.version) { %>
+                            <span class="badge">v<%= plugin.version %></span>
+                        <% } %>
+                        <% if (plugin.category) { %>
+                            <span class="badge" style="background: rgba(139, 92, 246, 0.2);">
+                                <%= plugin.category %>
+                            </span>
+                        <% } %>
+                        <span class="badge <%= plugin.enabled ? 'badge-success' : 'badge-warning' %>">
+                            <%= plugin.enabled ? 'Enabled' : 'Disabled' %>
+                        </span>
+                        <% if (plugin.featured) { %>
+                            <span class="badge" style="background: rgba(245, 158, 11, 0.2);">
+                                ⭐ Featured
+                            </span>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            
+            <% if (plugin.description) { %>
+                <p style="color: var(--gray); font-size: 1.1rem; max-width: 800px;">
+                    <%= plugin.description %>
+                </p>
+            <% } %>
+            
+            <% if (plugin.author) { %>
+                <p style="color: var(--gray); margin-top: 0.5rem;">
+                    By: <%= plugin.author %>
+                </p>
+            <% } %>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+            <!-- Main Content -->
+            <div>
+                <!-- Plugin HTML Content -->
+                <% if (plugin.frontend && plugin.frontend.html) { %>
+                    <div class="card" style="margin-bottom: 2rem;">
+                        <%= plugin.frontend.html %>
+                    </div>
+                <% } else { %>
+                    <div class="card" style="margin-bottom: 2rem; padding: 3rem 2rem; text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">⚙️</div>
+                        <h3>Plugin Interface</h3>
+                        <p style="color: var(--gray); margin: 1rem 0;">
+                            This plugin doesn't have a custom interface yet.
+                        </p>
+                        <p style="color: var(--gray); font-size: 0.9rem;">
+                            Try accessing it through the API endpoints or contact the plugin author.
+                        </p>
+                    </div>
+                <% } %>
+                
+                <!-- Plugin Details -->
+                <div class="card" style="margin-bottom: 2rem;">
+                    <h3 style="margin-bottom: 1rem;">📋 Plugin Details</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <p style="margin: 0.5rem 0;">
+                                <strong>ID:</strong> 
+                                <code style="background: var(--glass); padding: 0.25rem 0.5rem; border-radius: 4px;">
+                                    <%= plugin.id %>
+                                </code>
+                            </p>
+                            <p style="margin: 0.5rem 0;">
+                                <strong>Loaded:</strong> 
+                                <%= plugin.loadedAt ? new Date(plugin.loadedAt).toLocaleDateString() : 'Unknown' %>
+                            </p>
+                        </div>
+                        <div>
+                            <% if (plugin.config) { %>
+                                <p style="margin: 0.5rem 0;">
+                                    <strong>Status:</strong> 
+                                    <span style="color: <%= plugin.enabled ? 'var(--accent)' : 'var(--warning)' %>">
+                                        <%= plugin.enabled ? 'Active' : 'Inactive' %>
+                                    </span>
+                                </p>
+                            <% } %>
+                            <% if (plugin.filename) { %>
+                                <p style="margin: 0.5rem 0;">
+                                    <strong>File:</strong> 
+                                    <code style="font-size: 0.9rem;"><%= plugin.filename %></code>
+                                </p>
+                            <% } %>
+                        </div>
+                    </div>
+                    
+                    <!-- API Endpoints -->
+                    <% if (plugin.routes && plugin.routes.length > 0) { %>
+                        <div style="margin-top: 1.5rem;">
+                            <h4 style="margin-bottom: 0.5rem;">🌐 API Endpoints</h4>
+                            <div style="background: var(--glass); border-radius: var(--radius); padding: 1rem;">
+                                <% plugin.routes.forEach(route => { %>
+                                    <div style="
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 1rem;
+                                        padding: 0.5rem;
+                                        border-bottom: 1px solid var(--glass-border);
+                                    ">
+                                        <span style="
+                                            background: <%= route.method === 'GET' ? 'rgba(59, 130, 246, 0.2)' : 
+                                                         route.method === 'POST' ? 'rgba(16, 185, 129, 0.2)' : 
+                                                         route.method === 'PUT' ? 'rgba(245, 158, 11, 0.2)' : 
+                                                         route.method === 'DELETE' ? 'rgba(239, 68, 68, 0.2)' : 
+                                                         'rgba(139, 92, 246, 0.2)' %>;
+                                            color: <%= route.method === 'GET' ? '#3b82f6' : 
+                                                     route.method === 'POST' ? '#10b981' : 
+                                                     route.method === 'PUT' ? '#f59e0b' : 
+                                                     route.method === 'DELETE' ? '#ef4444' : 
+                                                     '#8b5cf6' %>;
+                                            padding: 0.25rem 0.5rem;
+                                            border-radius: 4px;
+                                            font-size: 0.8rem;
+                                            font-weight: bold;
+                                        ">
+                                            <%= route.method || 'GET' %>
+                                        </span>
+                                        <code style="font-size: 0.9rem;">/api/plugins/<%= plugin.id %><%= route.path %></code>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div>
+                <!-- Actions -->
+                <div class="card" style="margin-bottom: 2rem;">
+                    <h3 style="margin-bottom: 1rem;">⚡ Actions</h3>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <% if (plugin.enabled) { %>
+                            <button onclick="testPlugin('<%= plugin.id %>')" class="btn btn-primary">
+                                Test Plugin
+                            </button>
+                            
+                            <% if (user && user.role === 'admin') { %>
+                                <button onclick="togglePlugin('<%= plugin.id %>')" class="btn btn-warning">
+                                    Disable Plugin
+                                </button>
+                                <button onclick="reloadPlugin('<%= plugin.id %>')" class="btn btn-secondary">
+                                    Reload Plugin
+                                </button>
+                            <% } %>
+                        <% else if (user && user.role === 'admin') { %>
+                            <button onclick="togglePlugin('<%= plugin.id %>')" class="btn btn-success">
+                                Enable Plugin
+                            </button>
+                        <% } %>
+                        
+                        <a href="/plugins" class="btn btn-outline">
+                            ← Back to Plugins
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Similar Plugins -->
+                <% if (similar && similar.length > 0) { %>
+                    <div class="card">
+                        <h3 style="margin-bottom: 1rem;">🔄 Similar Plugins</h3>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <% similar.forEach(similarPlugin => { %>
+                                <a href="/plugins/<%= similarPlugin.id %>" 
+                                   style="
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 0.75rem;
+                                        padding: 0.75rem;
+                                        background: var(--glass);
+                                        border-radius: var(--radius);
+                                        text-decoration: none;
+                                        color: var(--light);
+                                        transition: var(--transition);
+                                   "
+                                   onmouseover="this.style.background='var(--glass-light)'"
+                                   onmouseout="this.style.background='var(--glass)'">
+                                    <span style="font-size: 1.5rem;"><%= similarPlugin.icon || '🧩' %></span>
+                                    <div>
+                                        <strong><%= similarPlugin.name %></strong>
+                                        <p style="color: var(--gray); font-size: 0.9rem; margin: 0.25rem 0 0;">
+                                            <%= similarPlugin.description?.substring(0, 50) || 'No description' %>...
+                                        </p>
+                                    </div>
+                                </a>
+                            <% }) %>
+                        </div>
+                    </div>
+                <% end %>
+                
+                <!-- Plugin Info -->
+                <div class="card" style="margin-top: 2rem;">
+                    <h3 style="margin-bottom: 1rem;">ℹ️ Information</h3>
+                    
+                    <div style="color: var(--gray); font-size: 0.9rem;">
+                        <p style="margin: 0.5rem 0;">
+                            <strong>Category:</strong> 
+                            <%= plugin.category || 'Uncategorized' %>
+                        </p>
+                        <p style="margin: 0.5rem 0;">
+                            <strong>Version:</strong> 
+                            <%= plugin.version || '1.0.0' %>
+                        </p>
+                        <% if (plugin.author) { %>
+                            <p style="margin: 0.5rem 0;">
+                                <strong>Author:</strong> 
+                                <%= plugin.author %>
+                            </p>
+                        <% } %>
+                        <p style="margin: 0.5rem 0;">
+                            <strong>Last Updated:</strong> 
+                            <%= plugin.loadedAt ? new Date(plugin.loadedAt).toLocaleDateString() : 'Unknown' %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<script>
+    // Plugin actions
+    async function testPlugin(pluginId) {
+        try {
+            const response = await fetch(`/api/plugins/${pluginId}/`);
+            const data = await response.json();
+            
+            if (data.success) {
+                alert(`✅ Plugin test successful!\n\n${JSON.stringify(data, null, 2)}`);
+            } else {
+                alert(`❌ Plugin test failed: ${data.error}`);
+            }
+        } catch (error) {
+            alert('Network error: ' + error.message);
+        }
+    }
+    
+    async function togglePlugin(pluginId) {
+        if (!confirm('Toggle plugin status?')) return;
+        
+        try {
+            const response = await fetch(`/admin/plugins/${pluginId}/toggle`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert(`Plugin ${data.enabled ? 'enabled' : 'disabled'} successfully`);
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (error) {
+            alert('Network error: ' + error.message);
+        }
+    }
+    
+    async function reloadPlugin(pluginId) {
+        if (!confirm('Reload plugin?')) return;
+        
+        try {
+            const response = await fetch(`/admin/plugins/${pluginId}/reload`, {
+                method: 'POST'
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('Plugin reloaded successfully');
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (error) {
+            alert('Network error: ' + error.message);
+        }
+    }
+</script>
