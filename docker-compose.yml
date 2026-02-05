@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  shadowcore:
+    build: .
+    container_name: shadowcore
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - SESSION_SECRET=${SESSION_SECRET}
+    volumes:
+      - ./data:/app/database
+      - ./uploads:/app/public/uploads
+      - ./plugins:/app/plugins
+    networks:
+      - shadowcore-network
+
+networks:
+  shadowcore-network:
+    driver: bridge
