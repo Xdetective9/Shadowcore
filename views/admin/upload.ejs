@@ -1,0 +1,361 @@
+<%- include('../layout', { currentPath: '/admin/plugins' }) %>
+
+<div class="container">
+    <div style="max-width: 800px; margin: 2rem auto;">
+        <!-- Header -->
+        <div style="margin-bottom: 3rem;">
+            <h1>📤 Upload Plugin</h1>
+            <p style="color: var(--gray);">
+                Upload a .plugin.js file to add new functionality
+            </p>
+        </div>
+        
+        <!-- Upload Form -->
+        <div class="card" style="padding: 2.5rem; margin-bottom: 2rem;">
+            <% if (error) { %>
+                <div style="
+                    background: rgba(239, 68, 68, 0.1);
+                    border: 1px solid rgba(239, 68, 68, 0.3);
+                    color: #fca5a5;
+                    padding: 1rem;
+                    border-radius: var(--radius);
+                    margin-bottom: 1.5rem;
+                ">
+                    <%= error %>
+                </div>
+            <% } %>
+            
+            <% if (success) { %>
+                <div style="
+                    background: rgba(16, 185, 129, 0.1);
+                    border: 1px solid rgba(16, 185, 129, 0.3);
+                    color: #34d399;
+                    padding: 1rem;
+                    border-radius: var(--radius);
+                    margin-bottom: 1.5rem;
+                ">
+                    <%= success %>
+                </div>
+            <% } %>
+            
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="form-label">Plugin File (.plugin.js)</label>
+                    <div style="
+                        border: 3px dashed var(--glass-border);
+                        border-radius: var(--radius);
+                        padding: 3rem 2rem;
+                        text-align: center;
+                        cursor: pointer;
+                        transition: var(--transition);
+                    " id="dropZone" 
+                       onmouseover="this.style.borderColor='var(--primary)'"
+                       onmouseout="this.style.borderColor='var(--glass-border)'">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">📁</div>
+                        <h3>Drag & Drop File Here</h3>
+                        <p style="color: var(--gray); margin: 0.5rem 0;">
+                            or click to browse
+                        </p>
+                        <p style="color: var(--gray); font-size: 0.9rem;">
+                            Max file size: 50MB
+                        </p>
+                    </div>
+                    <input 
+                        type="file" 
+                        name="plugin" 
+                        id="fileInput" 
+                        accept=".plugin.js" 
+                        required
+                        style="display: none;"
+                        onchange="updateFileName(this)"
+                    >
+                </div>
+                
+                <div id="selectedFile" style="
+                    background: var(--glass);
+                    border-radius: var(--radius);
+                    padding: 1rem;
+                    margin: 1.5rem 0;
+                    display: none;
+                ">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong id="fileName"></strong>
+                            <p style="color: var(--gray); margin: 0.25rem 0 0; font-size: 0.9rem;" id="fileSize"></p>
+                        </div>
+                        <button type="button" onclick="clearFile()" class="btn btn-sm btn-danger">
+                            Remove
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">
+                        Upload Plugin
+                    </button>
+                    <a href="/admin/plugins" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+            
+            <div id="uploadResult" style="margin-top: 2rem;"></div>
+        </div>
+        
+        <!-- Plugin Template -->
+        <div class="card">
+            <h3 style="margin-bottom: 1rem;">📝 Plugin Template</h3>
+            <p style="color: var(--gray); margin-bottom: 1.5rem;">
+                Your .plugin.js file should follow this structure:
+            </p>
+            
+            <pre style="
+                background: var(--darker);
+                border: 1px solid var(--glass-border);
+                border-radius: var(--radius);
+                padding: 1.5rem;
+                overflow-x: auto;
+                font-family: 'Monaco', 'Courier New', monospace;
+                font-size: 0.9rem;
+                line-height: 1.5;
+            ">
+<code>// Example plugin structure
+module.exports = {
+    // Required
+    name: 'My Plugin',
+    version: '1.0.0',
+    author: 'Your Name',
+    description: 'Plugin description',
+    
+    // Optional but recommended
+    icon: '🎨',
+    category: 'utility',
+    
+    // Plugin configuration
+    config: {
+        enabled: true,
+        apiKey: process.env.MY_API_KEY
+    },
+    
+    // Initialization function
+    init: async function(app, io, db) {
+        console.log('My Plugin initialized');
+        return { success: true };
+    },
+    
+    // Routes (auto-registered)
+    routes: [
+        {
+            method: 'get',
+            path: '/status',
+            handler: async (req, res) => {
+                res.json({ success: true, message: 'Plugin working' });
+            }
+        }
+    ],
+    
+    // Admin panel component (HTML)
+    admin: {
+        title: 'My Plugin',
+        icon: '🎨',
+        component: \`
+            &lt;div class="plugin-admin"&gt;
+                &lt;h3&gt;My Plugin Control Panel&lt;/h3&gt;
+                &lt;button onclick="testPlugin()"&gt;Test&lt;/button&gt;
+            &lt;/div&gt;
+        \`
+    },
+    
+    // Frontend CSS & JS injection
+    frontend: {
+        css: \`
+            .my-plugin { color: red; }
+        \`,
+        js: \`
+            console.log('My Plugin frontend loaded');
+        \`,
+        html: \`
+            &lt;div class="my-plugin"&gt;Hello World!&lt;/div&gt;
+        \`
+    },
+    
+    // Dependencies (auto-installed)
+    dependencies: ['axios', 'moment'],
+    
+    // Cleanup function
+    unload: async function() {
+        console.log('Plugin unloaded');
+    }
+};</code>
+            </pre>
+            
+            <div style="margin-top: 2rem;">
+                <a href="/admin/plugins" class="btn btn-secondary">
+                    ← Back to Plugin Manager
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Drag and drop functionality
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const selectedFile = document.getElementById('selectedFile');
+    
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+    });
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.style.borderColor = 'var(--primary)';
+            dropZone.style.background = 'rgba(99, 102, 241, 0.05)';
+        });
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.style.borderColor = 'var(--glass-border)';
+            dropZone.style.background = 'transparent';
+        });
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            updateFileName(fileInput);
+        }
+    });
+    
+    function updateFileName(input) {
+        if (input.files.length > 0) {
+            const file = input.files[0];
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = formatFileSize(file.size);
+            selectedFile.style.display = 'block';
+            
+            // Validate file type
+            if (!file.name.endsWith('.plugin.js')) {
+                alert('Error: File must be a .plugin.js file');
+                clearFile();
+            }
+        }
+    }
+    
+    function clearFile() {
+        fileInput.value = '';
+        selectedFile.style.display = 'none';
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Form submission
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const resultDiv = document.getElementById('uploadResult');
+        
+        resultDiv.innerHTML = `
+            <div style="
+                background: rgba(245, 158, 11, 0.1);
+                border: 1px solid rgba(245, 158, 11, 0.3);
+                color: #fbbf24;
+                padding: 1rem;
+                border-radius: var(--radius);
+                text-align: center;
+            ">
+                <div class="loading" style="margin: 0 auto;"></div>
+                <p style="margin: 0.5rem 0 0;">Uploading plugin...</p>
+            </div>
+        `;
+        
+        try {
+            const response = await fetch('/admin/plugins/upload', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                resultDiv.innerHTML = `
+                    <div style="
+                        background: rgba(16, 185, 129, 0.1);
+                        border: 1px solid rgba(16, 185, 129, 0.3);
+                        color: #34d399;
+                        padding: 1.5rem;
+                        border-radius: var(--radius);
+                    ">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">✅</div>
+                        <h3 style="margin: 0 0 0.5rem;">Upload Successful!</h3>
+                        <p style="margin: 0.5rem 0;">${result.message}</p>
+                        <p style="margin: 0.5rem 0; font-size: 0.9rem;">
+                            Plugin: <strong>${result.plugin?.name || 'Unknown'}</strong>
+                        </p>
+                        <div style="margin-top: 1rem;">
+                            <a href="/admin/plugins" class="btn btn-sm btn-primary">
+                                View in Plugin Manager
+                            </a>
+                            <a href="/plugins/${result.plugin?.id}" class="btn btn-sm btn-secondary">
+                                Open Plugin
+                            </a>
+                        </div>
+                    </div>
+                `;
+                
+                // Clear form
+                e.target.reset();
+                clearFile();
+                
+                // Auto-redirect after 3 seconds
+                setTimeout(() => {
+                    window.location.href = '/admin/plugins';
+                }, 3000);
+                
+            } else {
+                resultDiv.innerHTML = `
+                    <div style="
+                        background: rgba(239, 68, 68, 0.1);
+                        border: 1px solid rgba(239, 68, 68, 0.3);
+                        color: #fca5a5;
+                        padding: 1.5rem;
+                        border-radius: var(--radius);
+                    ">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">❌</div>
+                        <h3 style="margin: 0 0 0.5rem;">Upload Failed</h3>
+                        <p style="margin: 0.5rem 0;">${result.error || 'Unknown error'}</p>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            resultDiv.innerHTML = `
+                <div style="
+                    background: rgba(239, 68, 68, 0.1);
+                    border: 1px solid rgba(239, 68, 68, 0.3);
+                    color: #fca5a5;
+                    padding: 1.5rem;
+                    border-radius: var(--radius);
+                ">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">❌</div>
+                    <h3 style="margin: 0 0 0.5rem;">Network Error</h3>
+                    <p style="margin: 0.5rem 0;">${error.message}</p>
+                </div>
+            `;
+        }
+    });
+</script>
