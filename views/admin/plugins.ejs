@@ -1,0 +1,239 @@
+<%- include('../layout', { currentPath: '/admin/plugins' }) %>
+
+<div class="container">
+    <!-- Header -->
+    <div style="margin: 2rem 0 3rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>🧩 Plugin Manager</h1>
+            <p style="color: var(--gray);">
+                Manage all plugins • Total: <%= plugins.length %>
+            </p>
+        </div>
+        <a href="/admin/plugins/upload" class="btn btn-primary">
+            📤 Upload Plugin
+        </a>
+    </div>
+    
+    <!-- Search -->
+    <div class="card" style="margin-bottom: 2rem;">
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <div style="flex: 1;">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    class="form-control" 
+                    placeholder="Search plugins..."
+                >
+            </div>
+            <select id="categoryFilter" class="form-control" style="width: 200px;">
+                <option value="">All Categories</option>
+                <% if (categories && categories.length > 0) { %>
+                    <% categories.forEach(category => { %>
+                        <option value="<%= category %>"><%= category %></option>
+                    <% }) %>
+                <% } %>
+            </select>
+            <select id="statusFilter" class="form-control" style="width: 150px;">
+                <option value="">All Status</option>
+                <option value="enabled">Enabled</option>
+                <option value="disabled">Disabled</option>
+            </select>
+        </div>
+    </div>
+    
+    <!-- Plugins Table -->
+    <div class="card">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--glass-border);">
+                        <th style="padding: 1rem; text-align: left;">Plugin</th>
+                        <th style="padding: 1rem; text-align: left;">Version</th>
+                        <th style="padding: 1rem; text-align: left;">Category</th>
+                        <th style="padding: 1rem; text-align: left;">Status</th>
+                        <th style="padding: 1rem; text-align: left;">Author</th>
+                        <th style="padding: 1rem; text-align: left;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="pluginsTable">
+                    <% plugins.forEach(plugin => { %>
+                        <tr style="border-bottom: 1px solid var(--glass-border);"
+                            data-name="<%= plugin.name.toLowerCase() %>"
+                            data-category="<%= (plugin.category || '').toLowerCase() %>"
+                            data-status="<%= plugin.enabled ? 'enabled' : 'disabled' %>">
+                            <td style="padding: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <span style="font-size: 1.5rem;"><%= plugin.icon || '🧩' %></span>
+                                    <div>
+                                        <strong><%= plugin.name %></strong>
+                                        <% if (plugin.description) { %>
+                                            <p style="color: var(--gray); margin: 0.25rem 0 0; font-size: 0.9rem;">
+                                                <%= plugin.description.substring(0, 60) %>...
+                                            </p>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="padding: 1rem;">
+                                <code><%= plugin.version || '1.0.0' %></code>
+                            </td>
+                            <td style="padding: 1rem;">
+                                <% if (plugin.category) { %>
+                                    <span class="badge" style="background: rgba(139, 92, 246, 0.2);">
+                                        <%= plugin.category %>
+                                    </span>
+                                <% } else { %>
+                                    <span style="color: var(--gray);">-</span>
+                                <% } %>
+                            </td>
+                            <td style="padding: 1rem;">
+                                <span class="badge <%= plugin.enabled ? 'badge-success' : 'badge-warning' %>">
+                                    <%= plugin.enabled ? 'Enabled' : 'Disabled' %>
+                                </span>
+                            </td>
+                            <td style="padding: 1rem; color: var(--gray);">
+                                <%= plugin.author || 'Unknown' %>
+                            </td>
+                            <td style="padding: 1rem;">
+                                <div style="display: flex; gap: 0.25rem;">
+                                    <a href="/plugins/<%= plugin.id %>" class="btn btn-sm btn-secondary">
+                                        View
+                                    </a>
+                                    <button onclick="togglePlugin('<%= plugin.id %>')" 
+                                            class="btn btn-sm <%= plugin.enabled ? 'btn-warning' : 'btn-success' %>">
+                                        <%= plugin.enabled ? 'Disable' : 'Enable' %>
+                                    </button>
+                                    <button onclick="deletePlugin('<%= plugin.id %>', '<%= plugin.name %>')" 
+                                            class="btn btn-sm btn-danger">
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+        
+        <% if (plugins.length === 0) { %>
+            <div style="padding: 4rem 2rem; text-align: center;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">📦</div>
+                <h3>No Plugins Yet</h3>
+                <p style="color: var(--gray); margin: 1rem 0;">
+                    Upload your first plugin to get started
+                </p>
+                <a href="/admin/plugins/upload" class="btn btn-primary">
+                    Upload Plugin
+                </a>
+            </div>
+        <% } %>
+    </div>
+    
+    <!-- Quick Stats -->
+    <div style="margin-top: 3rem;">
+        <h2 style="margin-bottom: 1.5rem;">📊 Plugin Statistics</h2>
+        <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+            <div class="feature-card text-center">
+                <div style="font-size: 2.5rem; color: var(--primary);"><%= plugins.length %></div>
+                <p style="color: var(--gray);">Total Plugins</p>
+            </div>
+            
+            <div class="feature-card text-center">
+                <div style="font-size: 2.5rem; color: var(--accent);">
+                    <%= plugins.filter(p => p.enabled).length %>
+                </div>
+                <p style="color: var(--gray);">Enabled</p>
+            </div>
+            
+            <div class="feature-card text-center">
+                <div style="font-size: 2.5rem; color: var(--warning);">
+                    <%= plugins.filter(p => !p.enabled).length %>
+                </div>
+                <p style="color: var(--gray);">Disabled</p>
+            </div>
+            
+            <div class="feature-card text-center">
+                <div style="font-size: 2.5rem; color: var(--secondary);">
+                    <%= [...new Set(plugins.map(p => p.category).filter(Boolean))].length %>
+                </div>
+                <p style="color: var(--gray);">Categories</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Search and filter
+    document.getElementById('searchInput')?.addEventListener('input', filterPlugins);
+    document.getElementById('categoryFilter')?.addEventListener('change', filterPlugins);
+    document.getElementById('statusFilter')?.addEventListener('change', filterPlugins);
+    
+    function filterPlugins() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const category = document.getElementById('categoryFilter').value.toLowerCase();
+        const status = document.getElementById('statusFilter').value;
+        const rows = document.querySelectorAll('#pluginsTable tr');
+        
+        rows.forEach(row => {
+            const name = row.dataset.name;
+            const pluginCategory = row.dataset.category;
+            const pluginStatus = row.dataset.status;
+            
+            const matchesSearch = name.includes(searchTerm);
+            const matchesCategory = !category || pluginCategory === category;
+            const matchesStatus = !status || pluginStatus === status;
+            
+            if (matchesSearch && matchesCategory && matchesStatus) {
+                row.style.display = 'table-row';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    // Plugin actions
+    async function togglePlugin(pluginId) {
+        if (!confirm('Toggle plugin status?')) return;
+        
+        try {
+            const response = await fetch(`/admin/plugins/${pluginId}/toggle`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert(`Plugin ${data.enabled ? 'enabled' : 'disabled'} successfully`);
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (error) {
+            alert('Network error: ' + error.message);
+        }
+    }
+    
+    async function deletePlugin(pluginId, pluginName) {
+        if (!confirm(`Are you sure you want to delete "${pluginName}"? This action cannot be undone.`)) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/admin/plugins/${pluginId}`, {
+                method: 'DELETE'
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('Plugin deleted successfully');
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (error) {
+            alert('Network error: ' + error.message);
+        }
+    }
+</script>
