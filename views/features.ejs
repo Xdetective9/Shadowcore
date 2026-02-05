@@ -1,0 +1,171 @@
+<%- include('layout', { currentPath: '/features' }) %>
+
+<div class="container">
+    <section class="hero" style="padding: 6rem 0 4rem;">
+        <h1 class="hero-title">All Features</h1>
+        <p class="hero-subtitle">
+            Everything you need in one powerful platform
+        </p>
+    </section>
+    
+    <!-- Feature Categories -->
+    <% if (categories && categories.length > 0) { %>
+        <section style="margin: 3rem 0;">
+            <h2 style="text-align: center; margin-bottom: 2rem;">📂 Categories</h2>
+            <div class="features-grid">
+                <% categories.forEach(category => { %>
+                    <div class="feature-card">
+                        <div class="feature-icon"><%= category.icon %></div>
+                        <h3><%= category.name %></h3>
+                        <p style="color: var(--gray); margin: 0.5rem 0;">
+                            <%= category.count %> plugins available
+                        </p>
+                        <a href="/plugins?category=<%= category.name.toLowerCase() %>" 
+                           class="btn btn-sm btn-primary" style="margin-top: 1rem;">
+                            Browse
+                        </a>
+                    </div>
+                <% }) %>
+            </div>
+        </section>
+    <% end %>
+    
+    <!-- All Features Grid -->
+    <section style="margin: 4rem 0;">
+        <h2 style="text-align: center; margin-bottom: 2rem;">✨ Core Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🔌</div>
+                <h3>Auto-Loading Plugins</h3>
+                <p style="color: var(--gray);">
+                    Plugins load automatically without restarting. Just upload and use!
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3>Background Remover</h3>
+                <p style="color: var(--gray);">
+                    Remove backgrounds from images instantly using AI technology.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Blazing Fast</h3>
+                <p style="color: var(--gray);">
+                    Optimized for performance with caching and compression.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>Secure by Design</h3>
+                <p style="color: var(--gray);">
+                    Built-in security features and rate limiting.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🌓</div>
+                <h3>Theme System</h3>
+                <p style="color: var(--gray);">
+                    Switch between dark and light themes with one click.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>Mobile Responsive</h3>
+                <p style="color: var(--gray);">
+                    Works perfectly on all devices and screen sizes.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <h3>Auto Recovery</h3>
+                <p style="color: var(--gray);">
+                    Self-healing system that recovers from errors automatically.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Admin Dashboard</h3>
+                <p style="color: var(--gray);">
+                    Full control panel for managing users, plugins, and settings.
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Available Plugins -->
+    <% if (plugins && plugins.length > 0) { %>
+        <section style="margin: 4rem 0;">
+            <h2 style="text-align: center; margin-bottom: 2rem;">🧩 Available Plugins</h2>
+            <div class="plugin-grid">
+                <% plugins.forEach(plugin => { %>
+                    <div class="plugin-card">
+                        <div class="plugin-header">
+                            <div class="plugin-icon"><%= plugin.icon || '🧩' %></div>
+                            <h3><%= plugin.name %></h3>
+                            <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">
+                                <%= plugin.description || 'No description' %>
+                            </p>
+                        </div>
+                        <div class="plugin-body">
+                            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                                <% if (plugin.version) { %>
+                                    <span class="badge">v<%= plugin.version %></span>
+                                <% } %>
+                                <% if (plugin.category) { %>
+                                    <span class="badge" style="background: rgba(139, 92, 246, 0.2);">
+                                        <%= plugin.category %>
+                                    </span>
+                                <% } %>
+                            </div>
+                        </div>
+                        <div class="plugin-footer">
+                            <a href="/plugins/<%= plugin.id %>" class="btn btn-sm btn-primary" style="flex: 1;">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </section>
+    <% end %>
+    
+    <!-- CTA -->
+    <section style="
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+        border-radius: var(--radius-lg);
+        padding: 4rem 2rem;
+        text-align: center;
+        margin: 4rem 0;
+    ">
+        <h2 style="margin-bottom: 1rem;">Ready to Get Started?</h2>
+        <p style="color: var(--gray); max-width: 600px; margin: 0 auto 2rem;">
+            Join thousands of users who are already building amazing things with ShadowCore
+        </p>
+        
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <% if (user) { %>
+                <a href="/dashboard" class="btn btn-lg btn-primary">
+                    Go to Dashboard
+                </a>
+                <a href="/plugins" class="btn btn-lg btn-secondary">
+                    Browse Plugins
+                </a>
+            <% } else { %>
+                <a href="/signup" class="btn btn-lg btn-primary">
+                    Create Free Account
+                </a>
+                <a href="/login" class="btn btn-lg btn-outline">
+                    Login
+                </a>
+            <% } %>
+        </div>
+    </section>
+</div>
