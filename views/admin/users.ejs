@@ -1,0 +1,155 @@
+<%- include('../layout', { currentPath: '/admin/users' }) %>
+
+<div class="container">
+    <!-- Header -->
+    <div style="margin: 2rem 0 3rem;">
+        <h1>👥 User Management</h1>
+        <p style="color: var(--gray);">
+            Manage all user accounts • Total: <%= users.length %>
+        </p>
+    </div>
+    
+    <!-- Users Table -->
+    <div class="card">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--glass-border);">
+                        <th style="padding: 1rem; text-align: left;">User</th>
+                        <th style="padding: 1rem; text-align: left;">Email</th>
+                        <th style="padding: 1rem; text-align: left;">Role</th>
+                        <th style="padding: 1rem; text-align: left;">Joined</th>
+                        <th style="padding: 1rem; text-align: left;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(user => { %>
+                        <tr style="border-bottom: 1px solid var(--glass-border);">
+                            <td style="padding: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <div style="
+                                        width: 40px;
+                                        height: 40px;
+                                        background: var(--primary);
+                                        border-radius: 50%;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        color: white;
+                                        font-weight: bold;
+                                    ">
+                                        <%= user.username.charAt(0).toUpperCase() %>
+                                    </div>
+                                    <div>
+                                        <strong><%= user.username %></strong>
+                                        <p style="color: var(--gray); margin: 0.25rem 0 0; font-size: 0.9rem;">
+                                            ID: <%= user.id %>
+                                        </p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="padding: 1rem; color: var(--gray);">
+                                <%= user.email || 'No email' %>
+                            </td>
+                            <td style="padding: 1rem;">
+                                <select class="form-control" 
+                                        style="width: 120px;"
+                                        data-user-id="<%= user.id %>"
+                                        onchange="updateUserRole(this)"
+                                        <%= user.username === 'admin' ? 'disabled' : '' %>>
+                                    <option value="user" <%= user.role === 'user' ? 'selected' : '' %>>User</option>
+                                    <option value="admin" <%= user.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                                </select>
+                            </td>
+                            <td style="padding: 1rem; color: var(--gray);">
+                                <%= new Date(user.created_at).toLocaleDateString() %>
+                            </td>
+                            <td style="padding: 1rem;">
+                                <div style="display: flex; gap: 0.25rem;">
+                                    <button onclick="viewUser(<%= user.id %>)" class="btn btn-sm btn-secondary">
+                                        View
+                                    </button>
+                                    <% if (user.username !== 'admin') { %>
+                                        <button onclick="deleteUser(<%= user.id %>, '<%= user.username %>')" 
+                                                class="btn btn-sm btn-danger">
+                                            Delete
+                                        </button>
+                                    <% } %>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+        
+        <% if (users.length === 0) { %>
+            <div style="padding: 4rem 2rem; text-align: center;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">👤</div>
+                <h3>No Users Yet</h3>
+                <p style="color: var(--gray); margin: 1rem 0;">
+                    Users will appear here when they sign up
+                </p>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<script>
+    async function updateUserRole(select) {
+        const userId = select.dataset.userId;
+        const newRole = select.value;
+        
+        if (!confirm(`Change user role to ${newRole}?`)) {
+            select.value = select.dataset.originalValue || 'user';
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/admin/users/${userId}/role`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: newRole })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('User role updated successfully');
+            } else {
+                alert('Error: ' + data.error);
+                select.value = select.dataset.originalValue || 'user';
+            }
+        } catch (error) {
+            alert('Network error: ' + error.message);
+            select.value = select.dataset.originalValue || 'user';
+        }
+    }
+    
+    function viewUser(userId) {
+        window.location.href = `/admin/users/${userId}`;
+    }
+    
+    async function deleteUser(userId, username) {
+        if (!confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/admin/users/${userId}`, {
+                method: 'DELETE'
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('User deleted successfully');
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (error) {
+            alert('Network error: ' + error.message);
+        }
+    }
+</script>
