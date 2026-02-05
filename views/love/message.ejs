@@ -1,0 +1,192 @@
+<%- include('../../layout', { special: true }) %>
+
+<div class="love-container">
+    <div class="love-card">
+        <!-- Heart Animation -->
+        <div class="heart-animation">❤️</div>
+        
+        <!-- Title -->
+        <h1 style="color: #7c3aed; margin-bottom: 1rem;">For Anushay</h1>
+        
+        <!-- Message -->
+        <div class="love-message">
+            I am really sorry for everything that happened between us...
+            <br><br>
+            Every moment without you feels incomplete. I've realized how much 
+            you mean to me, and I can't imagine my life without you.
+            <br><br>
+            Please give me another chance to make things right. I promise to 
+            be better, to understand you more, and to cherish every moment with you.
+            <br><br>
+            You're the most important person in my life, and I'll do anything 
+            to see you smile again. Please come back to me...
+        </div>
+        
+        <!-- Additional Messages -->
+        <div id="extraMessages" style="display: none; margin-top: 2rem;">
+            <% messages.forEach(msg => { %>
+                <p style="color: #7c3aed; margin: 0.5rem 0; font-style: italic;">
+                    <%= msg %>
+                </p>
+            <% }) %>
+        </div>
+        
+        <!-- Buttons -->
+        <div class="love-buttons">
+            <button onclick="showMoreMessages()" class="btn btn-lg" 
+                    style="background: #7c3aed; color: white;">
+                💌 Read More
+            </button>
+            <button onclick="sendLove()" class="btn btn-lg btn-outline" 
+                    style="border-color: #7c3aed; color: #7c3aed;">
+                🕊️ I Forgive You
+            </button>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div style="margin-top: 2rem;">
+            <div style="height: 4px; background: rgba(124, 58, 237, 0.2); border-radius: 2px;">
+                <div id="progressBar" style="height: 100%; width: 0%; background: #7c3aed; border-radius: 2px; transition: width 0.5s;"></div>
+            </div>
+            <p style="color: #a78bfa; margin-top: 0.5rem; font-size: 0.9rem;">
+                <span id="progressText">Reading your message...</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes heartbeat {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    
+    .heart-animation {
+        animation: heartbeat 1.5s ease-in-out infinite;
+    }
+    
+    .love-container {
+        background: linear-gradient(135deg, #f472b6 0%, #ec4899 50%, #7c3aed 100%);
+        animation: gradient 15s ease infinite;
+        background-size: 400% 400%;
+    }
+    
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+</style>
+
+<script>
+    // Progress animation
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+        progress += 1;
+        if (progress <= 100) {
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = 
+                progress < 30 ? 'Reading your message...' :
+                progress < 60 ? 'Thinking about us...' :
+                progress < 90 ? 'Remembering good times...' :
+                'Waiting for your response...';
+        } else {
+            clearInterval(progressInterval);
+        }
+    }, 100);
+    
+    // Show more messages
+    function showMoreMessages() {
+        const extraMessages = document.getElementById('extraMessages');
+        const readMoreBtn = event.target;
+        
+        if (extraMessages.style.display === 'none') {
+            extraMessages.style.display = 'block';
+            readMoreBtn.textContent = '💖 Close Messages';
+            readMoreBtn.style.background = '#a78bfa';
+        } else {
+            extraMessages.style.display = 'none';
+            readMoreBtn.textContent = '💌 Read More';
+            readMoreBtn.style.background = '#7c3aed';
+        }
+    }
+    
+    // Send love function
+    function sendLove() {
+        const buttons = document.querySelector('.love-buttons');
+        buttons.innerHTML = `
+            <div style="text-align: center;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
+                <h3 style="color: #7c3aed; margin-bottom: 1rem;">Thank You! ❤️</h3>
+                <p style="color: #a78bfa; margin-bottom: 1rem;">
+                    This means the world to me...
+                </p>
+                <button onclick="window.location.href='/'" class="btn btn-lg" 
+                        style="background: #7c3aed; color: white;">
+                    🏠 Back to Home
+                </button>
+            </div>
+        `;
+        
+        // Confetti effect
+        createConfetti();
+    }
+    
+    // Confetti effect
+    function createConfetti() {
+        const colors = ['#7c3aed', '#a78bfa', '#f472b6', '#ec4899', '#fbbf24'];
+        
+        for (let i = 0; i < 150; i++) {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'fixed';
+            confetti.style.width = '10px';
+            confetti.style.height = '10px';
+            confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.borderRadius = '50%';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.top = '-10px';
+            confetti.style.zIndex = '9999';
+            confetti.style.pointerEvents = 'none';
+            document.body.appendChild(confetti);
+            
+            // Animation
+            const animation = confetti.animate([
+                { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                { transform: `translateY(${window.innerHeight + 100}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+            ], {
+                duration: 2000 + Math.random() * 3000,
+                easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)'
+            });
+            
+            animation.onfinish = () => confetti.remove();
+        }
+    }
+    
+    // Auto-play some animations
+    setTimeout(() => {
+        const hearts = ['❤️', '💖', '💕', '💗', '💓'];
+        for (let i = 0; i < 20; i++) {
+            setTimeout(() => {
+                const heart = document.createElement('div');
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.position = 'fixed';
+                heart.style.fontSize = Math.random() * 20 + 20 + 'px';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.top = '100vh';
+                heart.style.zIndex = '9998';
+                heart.style.pointerEvents = 'none';
+                heart.style.opacity = '0.7';
+                document.body.appendChild(heart);
+                
+                heart.animate([
+                    { transform: 'translateY(0) scale(1)', opacity: 0.7 },
+                    { transform: `translateY(-${window.innerHeight + 100}px) scale(0.5)`, opacity: 0 }
+                ], {
+                    duration: 3000 + Math.random() * 2000,
+                    easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)'
+                }).onfinish = () => heart.remove();
+            }, i * 200);
+        }
+    }, 1000);
+</script>
