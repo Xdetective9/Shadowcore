@@ -1,0 +1,244 @@
+<%- include('../layout', { currentPath: '/admin' }) %>
+
+<div class="container">
+    <!-- Header -->
+    <div style="margin: 2rem 0 3rem;">
+        <h1>⚡ Admin Dashboard</h1>
+        <p style="color: var(--gray);">
+            Welcome back, <%= user.username %> • Full control panel
+        </p>
+    </div>
+    
+    <!-- Stats Grid -->
+    <div class="admin-stats">
+        <div class="stat-card">
+            <div class="stat-value"><%= stats.totalUsers || 0 %></div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-value"><%= stats.totalPlugins || 0 %></div>
+            <div class="stat-label">Plugins</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-value"><%= stats.activePlugins || 0 %></div>
+            <div class="stat-label">Active Plugins</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-value"><%= stats.storageUsed || '0 MB' %></div>
+            <div class="stat-label">Storage Used</div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div style="margin: 3rem 0;">
+        <h2 style="margin-bottom: 1.5rem;">🚀 Quick Actions</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+            <a href="/admin/plugins/upload" class="card" style="
+                text-decoration: none;
+                color: inherit;
+                padding: 2rem;
+                text-align: center;
+                transition: var(--transition);
+            " onmouseover="this.style.transform='translateY(-5px)'" 
+               onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📤</div>
+                <h3>Upload Plugin</h3>
+                <p style="color: var(--gray); margin: 0.5rem 0;">
+                    Upload new .plugin.js files
+                </p>
+            </a>
+            
+            <a href="/admin/plugins" class="card" style="
+                text-decoration: none;
+                color: inherit;
+                padding: 2rem;
+                text-align: center;
+                transition: var(--transition);
+            " onmouseover="this.style.transform='translateY(-5px)'" 
+               onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🧩</div>
+                <h3>Manage Plugins</h3>
+                <p style="color: var(--gray); margin: 0.5rem 0;">
+                    Enable/disable plugins
+                </p>
+            </a>
+            
+            <a href="/admin/users" class="card" style="
+                text-decoration: none;
+                color: inherit;
+                padding: 2rem;
+                text-align: center;
+                transition: var(--transition);
+            " onmouseover="this.style.transform='translateY(-5px)'" 
+               onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
+                <h3>User Management</h3>
+                <p style="color: var(--gray); margin: 0.5rem 0;">
+                    Manage all users
+                </p>
+            </a>
+            
+            <a href="/admin/settings" class="card" style="
+                text-decoration: none;
+                color: inherit;
+                padding: 2rem;
+                text-align: center;
+                transition: var(--transition);
+            " onmouseover="this.style.transform='translateY(-5px)'" 
+               onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">⚙️</div>
+                <h3>Settings</h3>
+                <p style="color: var(--gray); margin: 0.5rem 0;">
+                    Platform configuration
+                </p>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Recent Users -->
+    <% if (users && users.length > 0) { %>
+        <div style="margin: 3rem 0;">
+            <h2 style="margin-bottom: 1.5rem;">👥 Recent Users</h2>
+            <div class="card">
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--glass-border);">
+                                <th style="padding: 1rem; text-align: left;">User</th>
+                                <th style="padding: 1rem; text-align: left;">Role</th>
+                                <th style="padding: 1rem; text-align: left;">Joined</th>
+                                <th style="padding: 1rem; text-align: left;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% users.forEach(user => { %>
+                                <tr style="border-bottom: 1px solid var(--glass-border);">
+                                    <td style="padding: 1rem;">
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <div style="
+                                                width: 40px;
+                                                height: 40px;
+                                                background: var(--primary);
+                                                border-radius: 50%;
+                                                display: flex;
+                                                align-items: center;
+                                                justify-content: center;
+                                                color: white;
+                                                font-weight: bold;
+                                            ">
+                                                <%= user.username.charAt(0).toUpperCase() %>
+                                            </div>
+                                            <div>
+                                                <strong><%= user.username %></strong>
+                                                <% if (user.email) { %>
+                                                    <p style="color: var(--gray); margin: 0.25rem 0 0; font-size: 0.9rem;">
+                                                        <%= user.email %>
+                                                    </p>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="padding: 1rem;">
+                                        <span style="
+                                            background: <%= user.role === 'admin' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(99, 102, 241, 0.2)' %>;
+                                            color: <%= user.role === 'admin' ? '#10b981' : '#6366f1' %>;
+                                            padding: 0.25rem 0.5rem;
+                                            border-radius: 4px;
+                                            font-size: 0.85rem;
+                                            font-weight: 500;
+                                        ">
+                                            <%= user.role %>
+                                        </span>
+                                    </td>
+                                    <td style="padding: 1rem; color: var(--gray);">
+                                        <%= new Date(user.created_at).toLocaleDateString() %>
+                                    </td>
+                                    <td style="padding: 1rem;">
+                                        <button onclick="manageUser(<%= user.id %>)" class="btn btn-sm btn-secondary">
+                                            Manage
+                                        </button>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="padding: 1rem; text-align: center; border-top: 1px solid var(--glass-border);">
+                    <a href="/admin/users" class="btn btn-sm btn-outline">
+                        View All Users →
+                    </a>
+                </div>
+            </div>
+        </div>
+    <% end %>
+    
+    <!-- Recent Plugins -->
+    <% if (plugins && plugins.length > 0) { %>
+        <div style="margin: 3rem 0;">
+            <h2 style="margin-bottom: 1.5rem;">🧩 Recent Plugins</h2>
+            <div class="plugin-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+                <% plugins.forEach(plugin => { %>
+                    <div class="plugin-card">
+                        <div class="plugin-header">
+                            <div class="plugin-icon"><%= plugin.icon || '🧩' %></div>
+                            <h3><%= plugin.name %></h3>
+                        </div>
+                        <div class="plugin-body">
+                            <% if (plugin.description) { %>
+                                <p style="color: var(--gray); font-size: 0.9rem; margin: 0.5rem 0;">
+                                    <%= plugin.description.substring(0, 80) %>...
+                                </p>
+                            <% } %>
+                            <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                                <span class="badge">v<%= plugin.version || '1.0.0' %></span>
+                                <span class="badge <%= plugin.enabled ? 'badge-success' : 'badge-warning' %>">
+                                    <%= plugin.enabled ? 'Enabled' : 'Disabled' %>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="plugin-footer">
+                            <a href="/plugins/<%= plugin.id %>" class="btn btn-sm btn-primary" style="flex: 1;">
+                                View
+                            </a>
+                            <button onclick="togglePlugin('<%= plugin.id %>')" 
+                                    class="btn btn-sm <%= plugin.enabled ? 'btn-warning' : 'btn-success' %>">
+                                <%= plugin.enabled ? 'Disable' : 'Enable' %>
+                            </button>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    <% end %>
+</div>
+
+<script>
+    function manageUser(userId) {
+        window.location.href = `/admin/users/${userId}`;
+    }
+    
+    async function togglePlugin(pluginId) {
+        if (!confirm('Toggle plugin status?')) return;
+        
+        try {
+            const response = await fetch(`/admin/plugins/${pluginId}/toggle`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert(`Plugin ${data.enabled ? 'enabled' : 'disabled'} successfully`);
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (error) {
+            alert('Network error: ' + error.message);
+        }
+    }
+</script>
