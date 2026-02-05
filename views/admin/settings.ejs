@@ -1,0 +1,306 @@
+<%- include('../layout', { currentPath: '/admin/settings' }) %>
+
+<div class="container">
+    <!-- Header -->
+    <div style="margin: 2rem 0 3rem;">
+        <h1>⚙️ Settings</h1>
+        <p style="color: var(--gray);">
+            Configure platform settings and environment
+        </p>
+    </div>
+    
+    <!-- Tabs -->
+    <div style="margin-bottom: 2rem;">
+        <div style="display: flex; gap: 0.5rem; border-bottom: 1px solid var(--glass-border);">
+            <button class="tab-btn active" onclick="showTab('general')">
+                General
+            </button>
+            <button class="tab-btn" onclick="showTab('appearance')">
+                Appearance
+            </button>
+            <button class="tab-btn" onclick="showTab('security')">
+                Security
+            </button>
+            <button class="tab-btn" onclick="showTab('system')">
+                System
+            </button>
+            <button class="tab-btn" onclick="showTab('env')">
+                Environment
+            </button>
+        </div>
+    </div>
+    
+    <!-- General Settings -->
+    <div id="generalTab" class="tab-content active">
+        <div class="card">
+            <h3 style="margin-bottom: 1.5rem;">General Settings</h3>
+            
+            <% if (settings.general) { %>
+                <% settings.general.forEach(setting => { %>
+                    <div class="form-group" style="margin-bottom: 1.5rem;">
+                        <label class="form-label"><%= setting.key.replace(/_/g, ' ').toUpperCase() %></label>
+                        <% if (setting.type === 'boolean') { %>
+                            <select class="form-control" 
+                                    data-key="<%= setting.key %>"
+                                    onchange="updateSetting(this)">
+                                <option value="1" <%= setting.value === '1' ? 'selected' : '' %>>Enabled</option>
+                                <option value="0" <%= setting.value === '0' ? 'selected' : '' %>>Disabled</option>
+                            </select>
+                        <% } else { %>
+                            <input type="text" 
+                                   class="form-control" 
+                                   value="<%= setting.value %>"
+                                   data-key="<%= setting.key %>"
+                                   onchange="updateSetting(this)">
+                        <% } %>
+                        <small style="color: var(--gray); display: block; margin-top: 0.25rem;">
+                            Category: <%= setting.category %>
+                        </small>
+                    </div>
+                <% }) %>
+            <% } %>
+        </div>
+    </div>
+    
+    <!-- Appearance Settings -->
+    <div id="appearanceTab" class="tab-content">
+        <div class="card">
+            <h3 style="margin-bottom: 1.5rem;">Appearance Settings</h3>
+            
+            <% if (settings.appearance) { %>
+                <% settings.appearance.forEach(setting => { %>
+                    <div class="form-group" style="margin-bottom: 1.5rem;">
+                        <label class="form-label"><%= setting.key.replace(/_/g, ' ').toUpperCase() %></label>
+                        <input type="text" 
+                               class="form-control" 
+                               value="<%= setting.value %>"
+                               data-key="<%= setting.key %>"
+                               onchange="updateSetting(this)">
+                    </div>
+                <% }) %>
+            <% } %>
+            
+            <!-- Theme Preview -->
+            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
+                <h4 style="margin-bottom: 1rem;">Theme Preview</h4>
+                <div style="display: flex; gap: 1rem;">
+                    <div style="
+                        background: var(--dark);
+                        border: 2px solid var(--glass-border);
+                        border-radius: var(--radius);
+                        padding: 1.5rem;
+                        flex: 1;
+                    ">
+                        <h5 style="margin: 0 0 0.5rem; color: white;">Dark Theme</h5>
+                        <p style="color: var(--gray); margin: 0;">Current active theme</p>
+                    </div>
+                    <div style="
+                        background: #f8fafc;
+                        border: 2px solid #e2e8f0;
+                        border-radius: var(--radius);
+                        padding: 1.5rem;
+                        flex: 1;
+                    ">
+                        <h5 style="margin: 0 0 0.5rem; color: #0f172a;">Light Theme</h5>
+                        <p style="color: #64748b; margin: 0;">Alternative theme</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- System Settings -->
+    <div id="systemTab" class="tab-content">
+        <div class="card">
+            <h3 style="margin-bottom: 1.5rem;">System Settings</h3>
+            
+            <% if (settings.system) { %>
+                <% settings.system.forEach(setting => { %>
+                    <div class="form-group" style="margin-bottom: 1.5rem;">
+                        <label class="form-label"><%= setting.key.replace(/_/g, ' ').toUpperCase() %></label>
+                        <input type="text" 
+                               class="form-control" 
+                               value="<%= setting.value %>"
+                               data-key="<%= setting.key %>"
+                               onchange="updateSetting(this)">
+                        <small style="color: var(--gray); display: block; margin-top: 0.25rem;">
+                            Type: <%= setting.type %>
+                        </small>
+                    </div>
+                <% }) %>
+            <% } %>
+            
+            <!-- System Info -->
+            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
+                <h4 style="margin-bottom: 1rem;">System Information</h4>
+                <div style="
+                    background: var(--glass);
+                    border-radius: var(--radius);
+                    padding: 1.5rem;
+                ">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <p style="margin: 0.5rem 0;">
+                                <strong>Node.js:</strong> <%= process.version %>
+                            </p>
+                            <p style="margin: 0.5rem 0;">
+                                <strong>Platform:</strong> <%= process.platform %>
+                            </p>
+                        </div>
+                        <div>
+                            <p style="margin: 0.5rem 0;">
+                                <strong>Uptime:</strong> 
+                                <%= Math.floor(process.uptime() / 3600) %> hours
+                            </p>
+                            <p style="margin: 0.5rem 0;">
+                                <strong>Memory:</strong> 
+                                <%= (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2) %> MB
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Environment Variables -->
+    <div id="envTab" class="tab-content">
+        <div class="card">
+            <h3 style="margin-bottom: 1.5rem;">Environment Variables</h3>
+            <p style="color: var(--gray); margin-bottom: 1.5rem;">
+                These values are loaded from your .env file
+            </p>
+            
+            <div style="
+                background: var(--darker);
+                border: 1px solid var(--glass-border);
+                border-radius: var(--radius);
+                padding: 1.5rem;
+                font-family: 'Monaco', 'Courier New', monospace;
+                font-size: 0.9rem;
+                line-height: 1.8;
+                max-height: 400px;
+                overflow-y: auto;
+            ">
+                <% Object.entries(env).forEach(([key, value]) => { %>
+                    <% if (value && !key.includes('SECRET') && !key.includes('PASSWORD') && !key.includes('KEY')) { %>
+                        <div>
+                            <span style="color: #818cf8;"><%= key %></span>
+                            <span style="color: var(--gray);">=</span>
+                            <span style="color: #34d399;">"<%= value %>"</span>
+                        </div>
+                    <% } else if (value) { %>
+                        <div>
+                            <span style="color: #818cf8;"><%= key %></span>
+                            <span style="color: var(--gray);">=</span>
+                            <span style="color: #fbbf24;">"********"</span>
+                        </div>
+                    <% } %>
+                <% }) %>
+            </div>
+            
+            <div style="margin-top: 1.5rem; color: var(--gray); font-size: 0.9rem;">
+                <p>⚠️ Sensitive values (passwords, keys, secrets) are hidden for security.</p>
+                <p>To change these values, edit your .env file and restart the server.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .tab-btn {
+        background: none;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        color: var(--gray);
+        font-weight: 500;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: var(--transition);
+    }
+    
+    .tab-btn:hover {
+        color: var(--light);
+    }
+    
+    .tab-btn.active {
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+    }
+    
+    .tab-content {
+        display: none;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+</style>
+
+<script>
+    // Tab switching
+    function showTab(tabName) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        // Remove active class from all buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Show selected tab
+        document.getElementById(tabName + 'Tab').classList.add('active');
+        
+        // Activate selected button
+        event.target.classList.add('active');
+    }
+    
+    // Update setting
+    async function updateSetting(element) {
+        const key = element.dataset.key;
+        const value = element.value;
+        const type = element.dataset.type || 'string';
+        
+        try {
+            const response = await fetch('/admin/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key, value, type })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Show success notification
+                showNotification('Setting updated successfully', 'success');
+            } else {
+                showNotification('Error: ' + data.error, 'error');
+            }
+        } catch (error) {
+            showNotification('Network error: ' + error.message, 'error');
+        }
+    }
+    
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <span style="font-size: 1.25rem;">
+                    ${type === 'success' ? '✅' : '❌'}
+                </span>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateY(-20px)';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+</script>
