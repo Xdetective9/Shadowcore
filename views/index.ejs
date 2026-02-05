@@ -1,0 +1,145 @@
+<%- include('layout', { currentPath: '/' }) %>
+
+<div class="container">
+    <section class="hero">
+        <h1 class="hero-title">ShadowCore</h1>
+        <p class="hero-subtitle">
+            Advanced Modular Platform • Auto-Loading Plugins • Beautiful Design
+        </p>
+        
+        <div style="margin: 2rem 0;">
+            <% if (!user) { %>
+                <a href="/signup" class="btn btn-lg btn-primary" style="margin-right: 1rem;">
+                    🚀 Get Started Free
+                </a>
+                <a href="/features" class="btn btn-lg btn-secondary">
+                    ✨ Explore Features
+                </a>
+            <% } else { %>
+                <a href="/dashboard" class="btn btn-lg btn-primary" style="margin-right: 1rem;">
+                    👋 Welcome Back, <%= user.username %>
+                </a>
+                <a href="/plugins" class="btn btn-lg btn-secondary">
+                    🧩 Browse Plugins
+                </a>
+            <% } %>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <div class="features-grid" style="margin: 4rem 0;">
+        <div class="feature-card text-center">
+            <div class="feature-icon">🧩</div>
+            <h3><%= stats.totalPlugins || 0 %> Plugins</h3>
+            <p>Ready to use instantly</p>
+        </div>
+        
+        <div class="feature-card text-center">
+            <div class="feature-icon">👥</div>
+            <h3><%= stats.totalUsers || 0 %> Users</h3>
+            <p>Growing community</p>
+        </div>
+        
+        <div class="feature-card text-center">
+            <div class="feature-icon">⚡</div>
+            <h3>Auto-Load</h3>
+            <p>Plugins load automatically</p>
+        </div>
+        
+        <div class="feature-card text-center">
+            <div class="feature-icon">🎨</div>
+            <h3>Beautiful UI</h3>
+            <p>Dark/Light themes</p>
+        </div>
+    </div>
+
+    <!-- Featured Plugins -->
+    <% if (plugins && plugins.length > 0) { %>
+        <section style="margin: 4rem 0;">
+            <h2 style="text-align: center; margin-bottom: 2rem;">🌟 Featured Plugins</h2>
+            <div class="plugin-grid">
+                <% plugins.slice(0, 4).forEach(plugin => { %>
+                    <div class="plugin-card">
+                        <div class="plugin-header">
+                            <div class="plugin-icon"><%= plugin.icon || '🧩' %></div>
+                            <h3><%= plugin.name %></h3>
+                            <p style="color: rgba(255,255,255,0.7);"><%= plugin.description || 'No description' %></p>
+                        </div>
+                        <div class="plugin-body">
+                            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                                <% if (plugin.version) { %>
+                                    <span class="badge">v<%= plugin.version %></span>
+                                <% } %>
+                                <% if (plugin.author) { %>
+                                    <span class="badge" style="background: rgba(139, 92, 246, 0.2);">
+                                        <%= plugin.author %>
+                                    </span>
+                                <% } %>
+                            </div>
+                        </div>
+                        <div class="plugin-footer">
+                            <a href="/plugins/<%= plugin.id %>" class="btn btn-sm btn-primary" style="flex: 1;">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="/plugins" class="btn btn-secondary">
+                    View All Plugins →
+                </a>
+            </div>
+        </section>
+    <% } %>
+
+    <!-- CTA Section -->
+    <section style="
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+        border-radius: var(--radius-lg);
+        padding: 4rem 2rem;
+        text-align: center;
+        margin: 4rem 0;
+    ">
+        <h2 style="margin-bottom: 1rem;">Ready to Build Something Amazing?</h2>
+        <p style="color: var(--gray); max-width: 600px; margin: 0 auto 2rem;">
+            Upload your own plugins or use our growing collection of tools
+        </p>
+        
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <% if (user) { %>
+                <% if (user.role === 'admin') { %>
+                    <a href="/admin/plugins/upload" class="btn btn-lg btn-primary">
+                        📤 Upload Plugin
+                    </a>
+                <% end %>
+                <a href="/dashboard" class="btn btn-lg btn-secondary">
+                    🚀 Go to Dashboard
+                </a>
+            <% } else { %>
+                <a href="/signup" class="btn btn-lg btn-primary">
+                    Create Free Account
+                </a>
+                <a href="/login" class="btn btn-lg btn-outline">
+                    Login
+                </a>
+            <% } %>
+        </div>
+    </section>
+</div>
+
+<style>
+    .badge {
+        background: rgba(99, 102, 241, 0.2);
+        color: #818cf8;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        display: inline-block;
+    }
+    
+    .text-center {
+        text-align: center;
+    }
+</style>
