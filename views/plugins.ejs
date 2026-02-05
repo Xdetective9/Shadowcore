@@ -1,0 +1,244 @@
+<%- include('layout', { currentPath: '/plugins' }) %>
+
+<div class="container">
+    <section class="hero" style="padding: 6rem 0 4rem;">
+        <h1 class="hero-title">Plugin Marketplace</h1>
+        <p class="hero-subtitle">
+            Extend your platform with powerful plugins
+        </p>
+        
+        <% if (user && user.role === 'admin') { %>
+            <div style="margin-top: 2rem;">
+                <a href="/admin/plugins/upload" class="btn btn-lg btn-primary">
+                    📤 Upload Plugin
+                </a>
+            </div>
+        <% } %>
+    </section>
+    
+    <!-- Search & Filter -->
+    <div class="card" style="margin-bottom: 2rem;">
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <div style="flex: 1;">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    class="form-control" 
+                    placeholder="Search plugins..."
+                >
+            </div>
+            <select id="categoryFilter" class="form-control" style="width: 200px;">
+                <option value="">All Categories</option>
+                <% if (categories && categories.length > 0) { %>
+                    <% categories.forEach(category => { %>
+                        <option value="<%= category %>"><%= category %></option>
+                    <% }) %>
+                <% } %>
+            </select>
+        </div>
+    </div>
+    
+    <!-- Featured Plugins -->
+    <% if (featured && featured.length > 0) { %>
+        <section style="margin: 3rem 0;">
+            <h2 style="margin-bottom: 1.5rem;">🌟 Featured Plugins</h2>
+            <div class="plugin-grid">
+                <% featured.forEach(plugin => { %>
+                    <div class="plugin-card">
+                        <div class="plugin-header">
+                            <div class="plugin-icon"><%= plugin.icon || '🧩' %></div>
+                            <h3><%= plugin.name %></h3>
+                            <p style="color: rgba(255,255,255,0.7);">
+                                <%= plugin.description || 'No description' %>
+                            </p>
+                        </div>
+                        <div class="plugin-body">
+                            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                                <% if (plugin.version) { %>
+                                    <span class="badge">v<%= plugin.version %></span>
+                                <% } %>
+                                <% if (plugin.category) { %>
+                                    <span class="badge" style="background: rgba(139, 92, 246, 0.2);">
+                                        <%= plugin.category %>
+                                    </span>
+                                <% } %>
+                                <% if (plugin.featured) { %>
+                                    <span class="badge" style="background: rgba(245, 158, 11, 0.2);">
+                                        Featured
+                                    </span>
+                                <% } %>
+                            </div>
+                            <% if (plugin.author) { %>
+                                <p style="color: var(--gray); font-size: 0.9rem;">
+                                    By: <%= plugin.author %>
+                                </p>
+                            <% } %>
+                        </div>
+                        <div class="plugin-footer">
+                            <a href="/plugins/<%= plugin.id %>" class="btn btn-sm btn-primary" style="flex: 1;">
+                                View Details
+                            </a>
+                            <% if (user && user.role === 'admin') { %>
+                                <button onclick="togglePlugin('<%= plugin.id %>')" 
+                                        class="btn btn-sm <%= plugin.enabled ? 'btn-warning' : 'btn-success' %>">
+                                    <%= plugin.enabled ? 'Disable' : 'Enable' %>
+                                </button>
+                            <% } %>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </section>
+    <% end %>
+    
+    <!-- All Plugins -->
+    <section style="margin: 4rem 0;">
+        <h2 style="margin-bottom: 1.5rem;">📦 All Plugins</h2>
+        
+        <% if (plugins && plugins.length > 0) { %>
+            <div class="plugin-grid" id="pluginsGrid">
+                <% plugins.forEach(plugin => { %>
+                    <div class="plugin-card" 
+                         data-name="<%= plugin.name.toLowerCase() %>"
+                         data-category="<%= (plugin.category || '').toLowerCase() %>">
+                        <div class="plugin-header">
+                            <div class="plugin-icon"><%= plugin.icon || '🧩' %></div>
+                            <h3><%= plugin.name %></h3>
+                            <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">
+                                <%= plugin.description || 'No description' %>
+                            </p>
+                        </div>
+                        <div class="plugin-body">
+                            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                                <% if (plugin.version) { %>
+                                    <span class="badge">v<%= plugin.version %></span>
+                                <% } %>
+                                <% if (plugin.category) { %>
+                                    <span class="badge" style="background: rgba(139, 92, 246, 0.2);">
+                                        <%= plugin.category %>
+                                    </span>
+                                <% } %>
+                                <span class="badge <%= plugin.enabled ? 'badge-success' : 'badge-warning' %>">
+                                    <%= plugin.enabled ? 'Enabled' : 'Disabled' %>
+                                </span>
+                            </div>
+                            <% if (plugin.author) { %>
+                                <p style="color: var(--gray); font-size: 0.9rem; margin: 0.5rem 0;">
+                                    By: <%= plugin.author %>
+                                </p>
+                            <% } %>
+                        </div>
+                        <div class="plugin-footer">
+                            <a href="/plugins/<%= plugin.id %>" class="btn btn-sm btn-primary" style="flex: 1;">
+                                Open Plugin
+                            </a>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% else { %>
+            <div class="card" style="text-align: center; padding: 4rem 2rem;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">📦</div>
+                <h3>No Plugins Yet</h3>
+                <p style="color: var(--gray); max-width: 400px; margin: 1rem auto;">
+                    Plugins will appear here when uploaded.
+                    <% if (user && user.role === 'admin') { %>
+                        <br>You can upload plugins from the admin panel.
+                    <% } %>
+                </p>
+                <% if (user && user.role === 'admin') { %>
+                    <a href="/admin/plugins/upload" class="btn btn-primary" style="margin-top: 1rem;">
+                        Upload Your First Plugin
+                    </a>
+                <% } else if (!user) { %>
+                    <a href="/signup" class="btn btn-primary" style="margin-top: 1rem;">
+                        Sign Up to Access Plugins
+                    </a>
+                <% } %>
+            </div>
+        <% end %>
+    </section>
+    
+    <!-- Plugin Upload Info -->
+    <% if (user && user.role === 'admin') { %>
+        <section style="margin: 4rem 0;">
+            <div class="card">
+                <h3 style="margin-bottom: 1rem;">📤 Plugin Upload Guide</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <h4>Requirements</h4>
+                        <ul style="color: var(--gray); margin: 1rem 0; padding-left: 1.5rem;">
+                            <li>File must be .plugin.js</li>
+                            <li>Must export a valid plugin object</li>
+                            <li>Include name, version, and init function</li>
+                            <li>Max file size: 50MB</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Features</h4>
+                        <ul style="color: var(--gray); margin: 1rem 0; padding-left: 1.5rem;">
+                            <li>Auto-load routes</li>
+                            <li>CSS/JS injection</li>
+                            <li>Admin panel integration</li>
+                            <li>Dependency auto-install</li>
+                        </ul>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 2rem;">
+                    <a href="/admin/plugins/upload" class="btn btn-primary">
+                        Upload Plugin Now
+                    </a>
+                </div>
+            </div>
+        </section>
+    <% end %>
+</div>
+
+<script>
+    // Search and filter functionality
+    document.getElementById('searchInput')?.addEventListener('input', filterPlugins);
+    document.getElementById('categoryFilter')?.addEventListener('change', filterPlugins);
+    
+    function filterPlugins() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const category = document.getElementById('categoryFilter').value.toLowerCase();
+        const plugins = document.querySelectorAll('#pluginsGrid .plugin-card');
+        
+        plugins.forEach(plugin => {
+            const name = plugin.dataset.name;
+            const pluginCategory = plugin.dataset.category;
+            
+            const matchesSearch = name.includes(searchTerm);
+            const matchesCategory = !category || pluginCategory === category;
+            
+            if (matchesSearch && matchesCategory) {
+                plugin.style.display = 'block';
+            } else {
+                plugin.style.display = 'none';
+            }
+        });
+    }
+    
+    // Plugin toggle function
+    async function togglePlugin(pluginId) {
+        if (!confirm('Toggle plugin status?')) return;
+        
+        try {
+            const response = await fetch(`/admin/plugins/${pluginId}/toggle`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert(`Plugin ${data.enabled ? 'enabled' : 'disabled'} successfully`);
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (error) {
+            alert('Network error: ' + error.message);
+        }
+    }
+</script>
