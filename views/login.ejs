@@ -1,0 +1,98 @@
+<%- include('layout', { currentPath: '/login' }) %>
+
+<div class="container">
+    <div style="max-width: 400px; margin: 6rem auto;">
+        <div class="card" style="padding: 2.5rem;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🔐</div>
+                <h2>Welcome Back</h2>
+                <p style="color: var(--gray);">Login to your ShadowCore account</p>
+            </div>
+            
+            <% if (error) { %>
+                <div style="
+                    background: rgba(239, 68, 68, 0.1);
+                    border: 1px solid rgba(239, 68, 68, 0.3);
+                    color: #fca5a5;
+                    padding: 1rem;
+                    border-radius: var(--radius);
+                    margin-bottom: 1.5rem;
+                ">
+                    <%= error %>
+                </div>
+            <% } %>
+            
+            <% if (success) { %>
+                <div style="
+                    background: rgba(16, 185, 129, 0.1);
+                    border: 1px solid rgba(16, 185, 129, 0.3);
+                    color: #34d399;
+                    padding: 1rem;
+                    border-radius: var(--radius);
+                    margin-bottom: 1.5rem;
+                ">
+                    <%= success %>
+                </div>
+            <% } %>
+            
+            <form method="POST" action="/login">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input 
+                        type="text" 
+                        name="username" 
+                        class="form-control" 
+                        placeholder="Enter your username" 
+                        required
+                        value="<%= username || '' %>"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        class="form-control" 
+                        placeholder="Enter your password" 
+                        required
+                    >
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1rem;">
+                    Login
+                </button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <p style="color: var(--gray);">
+                    Don't have an account? 
+                    <a href="/signup" style="color: var(--primary); text-decoration: none;">
+                        Sign up here
+                    </a>
+                </p>
+                
+                <p style="color: var(--gray); font-size: 0.9rem; margin-top: 1rem;">
+                    Admin? <a href="/admin/login" style="color: var(--primary);">Login as admin</a>
+                </p>
+            </div>
+        </div>
+        
+        <!-- Demo Credentials -->
+        <div style="
+            margin-top: 2rem;
+            padding: 1rem;
+            background: var(--glass);
+            border-radius: var(--radius);
+            text-align: center;
+            color: var(--gray);
+            font-size: 0.9rem;
+        ">
+            <p style="margin-bottom: 0.5rem;">Demo Credentials:</p>
+            <p style="font-family: monospace; margin: 0.25rem 0;">
+                Username: <strong>admin</strong><br>
+                Password: <strong>ShadowCore@2024</strong>
+            </p>
+        </div>
+    </div>
+</div>
