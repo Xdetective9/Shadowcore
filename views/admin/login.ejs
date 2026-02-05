@@ -1,0 +1,82 @@
+<%- include('../layout', { currentPath: '/admin/login', special: true }) %>
+
+<div class="container">
+    <div style="max-width: 400px; margin: 8rem auto;">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">⚡</div>
+            <h1>Admin Login</h1>
+            <p style="color: var(--gray);">ShadowCore Control Panel</p>
+        </div>
+        
+        <div class="card" style="padding: 2.5rem;">
+            <% if (error) { %>
+                <div style="
+                    background: rgba(239, 68, 68, 0.1);
+                    border: 1px solid rgba(239, 68, 68, 0.3);
+                    color: #fca5a5;
+                    padding: 1rem;
+                    border-radius: var(--radius);
+                    margin-bottom: 1.5rem;
+                ">
+                    <%= error %>
+                </div>
+            <% } %>
+            
+            <form method="POST" action="/admin/login">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input 
+                        type="text" 
+                        name="username" 
+                        class="form-control" 
+                        placeholder="Enter admin username" 
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        class="form-control" 
+                        placeholder="Enter admin password" 
+                        required
+                    >
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1rem;">
+                    Login as Admin
+                </button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="/" style="color: var(--gray); text-decoration: none;">
+                    ← Back to Home
+                </a>
+            </div>
+        </div>
+        
+        <!-- Admin Info -->
+        <div style="
+            margin-top: 2rem;
+            padding: 1rem;
+            background: var(--glass);
+            border-radius: var(--radius);
+            text-align: center;
+            color: var(--gray);
+            font-size: 0.9rem;
+        ">
+            <p style="margin: 0.5rem 0;">
+                <strong>Default Admin Credentials:</strong>
+            </p>
+            <p style="font-family: monospace; margin: 0.25rem 0;">
+                Username: <strong>admin</strong><br>
+                Password: <strong>ShadowCore@2024</strong>
+            </p>
+            <p style="margin: 0.5rem 0; font-size: 0.85rem;">
+                Change password in .env file
+            </p>
+        </div>
+    </div>
+</div>
