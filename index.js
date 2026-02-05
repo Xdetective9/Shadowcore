@@ -29,8 +29,10 @@ const logger = winston.createLogger({
 
 // Create app
 const app = express();
-const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST || '0.0.0.0';
+
+// IMPORTANT: Render needs dynamic port binding
+const PORT = process.env.PORT || 10000; // Render uses 10000
+const HOST = '0.0.0.0'; // Bind to all interfaces
 
 // Create necessary directories
 async function createDirectories() {
@@ -82,12 +84,13 @@ app.use(require('express-rate-limit')({
   message: 'Too many requests from this IP'
 }));
 
-// Session setup
+// Session setup - MemoryStore for simplicity
 app.use(session({
-  store: new SQLiteStore({
-    dir: './database',
-    db: 'sessions.db'
-  }),
+  store: process.env.NODE_ENV === 'production' ? 
+    new SQLiteStore({
+      dir: './database',
+      db: 'sessions.db'
+    }) : undefined,
   secret: process.env.SESSION_SECRET || 'shadowcore-secret-' + Date.now(),
   resave: false,
   saveUninitialized: false,
@@ -120,56 +123,59 @@ const { initDatabase, db } = require('./utils/database');
 const PluginLoader = require('./utils/plugin-manager');
 const pluginLoader = new PluginLoader(app);
 
-// ========== LOAD CORE ROUTES ==========
+// ========== BASIC ROUTES (For health check) ==========
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'ShadowCore is running',
+    version: '3.0.0',
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
+// ========== LOAD OTHER ROUTES ==========
 async function loadRoutes() {
-  const routeFiles = ['index', 'auth', 'admin', 'plugins', 'api', 'love'];
-  
-  for (const file of routeFiles) {
-    try {
-      const routePath = path.join(__dirname, 'routes', `${file}.js`);
-      await fs.access(routePath);
-      const route = require(routePath);
-      app.use('/', route);
-      logger.info(`Loaded route: ${file}`);
-    } catch (err) {
-      logger.warn(`Route file ${file}.js not found, skipping`);
-    }
+  try {
+    // Load auth routes
+    const authRoutes = require('./routes/auth');
+    app.use('/', authRoutes);
+    logger.info('Loaded auth routes');
+    
+    // Load admin routes
+    const adminRoutes = require('./routes/admin');
+    app.use('/', adminRoutes);
+    logger.info('Loaded admin routes');
+    
+    // Load main routes
+    const mainRoutes = require('./routes/index');
+    app.use('/', mainRoutes);
+    logger.info('Loaded main routes');
+    
+  } catch (err) {
+    logger.warn('Some routes failed to load:', err.message);
   }
 }
 
 // ========== ERROR HANDLING ==========
 app.use((req, res, next) => {
-  res.status(404).render('errors/404', {
-    title: '404 - Page Not Found',
-    message: 'The page you\'re looking for doesn\'t exist.'
+  res.status(404).json({
+    error: 'Not Found',
+    message: 'The requested resource was not found'
   });
 });
 
 app.use((err, req, res, next) => {
   logger.error('Server error:', err);
-  res.status(err.status || 500).render('errors/500', {
-    title: 'Server Error',
-    message: 'Something went wrong. Please try again later.',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
-
-// ========== SOCKET.IO SETUP ==========
-const server = require('http').createServer(app);
-const io = require('socket.io')(server);
-
-io.on('connection', (socket) => {
-  logger.info(`Socket connected: ${socket.id}`);
-  
-  // Handle plugin socket events
-  global.pluginSockets.forEach(event => {
-    if (typeof event === 'function') {
-      event(socket, io);
-    }
-  });
-  
-  socket.on('disconnect', () => {
-    logger.info(`Socket disconnected: ${socket.id}`);
+  res.status(err.status || 500).json({
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
   });
 });
 
@@ -191,48 +197,40 @@ async function startServer() {
     await loadRoutes();
     
     // Start server
-    server.listen(PORT, HOST, () => {
+    const server = app.listen(PORT, HOST, () => {
+      const address = server.address();
       console.log(chalk.green(`
 ╔══════════════════════════════════════════════════════════╗
 ║                🚀 SHADOWCORE v3.0                       ║
 ╠══════════════════════════════════════════════════════════╣
-║ 📍 Server: ${HOST}:${PORT}                              ║
+║ 📍 Server: ${HOST}:${address.port}                      ║
 ║ 🌐 Environment: ${process.env.NODE_ENV || 'development'} ║
 ║ 📦 Plugins: ${global.plugins.size} loaded               ║
 ║ 🗄️ Database: SQLite (shadowcore.db)                    ║
 ╠══════════════════════════════════════════════════════════╣
 ║                ✅ SYSTEM OPERATIONAL                    ║
 ╚══════════════════════════════════════════════════════════╝
-
-👤 Owner: ${process.env.OWNER_NAME || 'Abdullah'}
-📧 Contact: ${process.env.OWNER_EMAIL || ''}
-🔗 Home: http://${HOST}:${PORT}
-🔐 Admin: /admin/login
-🧩 Plugins: /plugins
-📱 Dashboard: /dashboard
-❤️ Special: /love/anushay
       `));
     });
     
-    // Auto-recover on crash
-    process.on('uncaughtException', (err) => {
-      logger.error('Uncaught Exception:', err);
-      // Don't crash, try to recover
-      setTimeout(() => {
-        logger.info('Attempting recovery...');
-      }, 5000);
+    // Handle Render's port detection
+    server.on('listening', () => {
+      console.log(`✅ Server listening on port ${PORT}`);
     });
     
   } catch (error) {
     logger.error('Failed to start server:', error);
-    process.exit(1);
+    // Don't exit, try to start basic server
+    app.listen(PORT, HOST, () => {
+      console.log(`✅ Basic server started on port ${PORT}`);
+    });
   }
 }
 
-// Export for testing
-module.exports = { app, server, io };
+// Export for Vercel
+module.exports = app;
 
-// Start the server
+// Start server if not in Vercel
 if (require.main === module) {
   startServer();
 }
