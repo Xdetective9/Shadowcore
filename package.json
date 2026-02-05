@@ -8,7 +8,11 @@
     "dev": "nodemon index.js",
     "setup": "node setup.js",
     "deploy": "npm run setup && npm start",
-    "test": "node test.js"
+    "vercel-build": "npm run setup",
+    "vercel-dev": "npm run dev",
+    "render": "PORT=10000 npm start",
+    "railway": "npm run setup && npm start",
+    "docker": "docker-compose up -d"
   },
   "dependencies": {
     "express": "^4.18.3",
