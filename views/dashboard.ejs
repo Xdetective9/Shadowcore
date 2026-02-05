@@ -1,0 +1,142 @@
+<%- include('layout', { currentPath: '/dashboard' }) %>
+
+<div class="container">
+    <!-- Welcome Section -->
+    <div style="margin: 2rem 0 3rem;">
+        <h1>👋 Welcome, <%= user.username %>!</h1>
+        <p style="color: var(--gray);">
+            Your ShadowCore Dashboard
+            <% if (user.role === 'admin') { %>
+                <span style="color: var(--accent); margin-left: 0.5rem;">(Admin)</span>
+            <% } %>
+        </p>
+    </div>
+    
+    <!-- Quick Stats -->
+    <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+        <div class="feature-card">
+            <h3>📊 Your Stats</h3>
+            <div style="margin-top: 1rem;">
+                <p><strong>Account Created:</strong> 
+                    <%= new Date(user.createdAt).toLocaleDateString() %>
+                </p>
+                <p><strong>Role:</strong> 
+                    <span style="color: <%= user.role === 'admin' ? 'var(--accent)' : 'var(--primary)' %>">
+                        <%= user.role %>
+                    </span>
+                </p>
+                <% if (user.email) { %>
+                    <p><strong>Email:</strong> <%= user.email %></p>
+                <% } %>
+            </div>
+        </div>
+        
+        <div class="feature-card">
+            <h3>🧩 Available Plugins</h3>
+            <div style="margin-top: 1rem; text-align: center;">
+                <div style="font-size: 3rem; color: var(--primary);">
+                    <%= plugins ? plugins.length : 0 %>
+                </div>
+                <p style="color: var(--gray);">plugins ready to use</p>
+                <a href="/plugins" class="btn btn-primary" style="margin-top: 1rem;">
+                    Browse All
+                </a>
+            </div>
+        </div>
+        
+        <div class="feature-card">
+            <h3>🚀 Quick Actions</h3>
+            <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <a href="/plugins" class="btn btn-secondary">
+                    🧩 Browse Plugins
+                </a>
+                <a href="/features" class="btn btn-secondary">
+                    ✨ View Features
+                </a>
+                <% if (user.role === 'admin') { %>
+                    <a href="/admin" class="btn btn-success">
+                        ⚡ Admin Panel
+                    </a>
+                <% } %>
+                <a href="/logout" class="btn btn-danger">
+                    🚪 Logout
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Your Plugins -->
+    <% if (plugins && plugins.length > 0) { %>
+        <section style="margin: 4rem 0;">
+            <h2 style="margin-bottom: 1.5rem;">🌟 Your Plugins</h2>
+            <div class="plugin-grid">
+                <% plugins.forEach(plugin => { %>
+                    <div class="plugin-card">
+                        <div class="plugin-header">
+                            <div class="plugin-icon"><%= plugin.icon || '🧩' %></div>
+                            <h3><%= plugin.name %></h3>
+                            <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">
+                                <%= plugin.description || 'No description' %>
+                            </p>
+                        </div>
+                        <div class="plugin-body">
+                            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                                <% if (plugin.version) { %>
+                                    <span class="badge">v<%= plugin.version %></span>
+                                <% } %>
+                                <span class="badge <%= plugin.enabled ? 'badge-success' : 'badge-warning' %>">
+                                    <%= plugin.enabled ? 'Enabled' : 'Disabled' %>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="plugin-footer">
+                            <a href="/plugins/<%= plugin.id %>" class="btn btn-sm btn-primary" style="flex: 1;">
+                                Open
+                            </a>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </section>
+    <% end %>
+    
+    <!-- Recent Activity -->
+    <% if (recentActivity && recentActivity.length > 0) { %>
+        <section style="margin: 4rem 0;">
+            <h2 style="margin-bottom: 1.5rem;">📝 Recent Activity</h2>
+            <div class="card">
+                <div style="max-height: 300px; overflow-y: auto;">
+                    <% recentActivity.forEach(activity => { %>
+                        <div style="
+                            display: flex;
+                            align-items: center;
+                            gap: 1rem;
+                            padding: 1rem;
+                            border-bottom: 1px solid var(--glass-border);
+                        ">
+                            <span style="font-size: 1.5rem;"><%= activity.icon %></span>
+                            <div style="flex: 1;">
+                                <p style="margin: 0; font-weight: 500;"><%= activity.action %></p>
+                                <p style="margin: 0.25rem 0 0; color: var(--gray); font-size: 0.9rem;">
+                                    <%= activity.time %>
+                                </p>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        </section>
+    <% end %>
+</div>
+
+<style>
+    .badge-success {
+        background: rgba(16, 185, 129, 0.2);
+        color: #34d399;
+    }
+    
+    .badge-warning {
+        background: rgba(245, 158, 11, 0.2);
+        color: #fbbf24;
+    }
+</style>
