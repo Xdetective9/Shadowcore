@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Error | ShadowCore</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body class="dark-theme">
+    <div class="container" style="min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center;">
+        <div>
+            <div style="font-size: 6rem; color: var(--danger); margin-bottom: 1rem;">⚠️</div>
+            <h1 style="margin-bottom: 1rem;">Server Error</h1>
+            <p style="color: var(--gray); max-width: 500px; margin: 1rem auto 2rem;">
+                <%= message || "Something went wrong on our end. Please try again later." %>
+            </p>
+            
+            <% if (error && process.env.NODE_ENV === 'development') { %>
+                <div style="
+                    background: rgba(239, 68, 68, 0.1);
+                    border: 1px solid rgba(239, 68, 68, 0.3);
+                    border-radius: var(--radius);
+                    padding: 1.5rem;
+                    margin: 2rem auto;
+                    max-width: 600px;
+                    text-align: left;
+                ">
+                    <h4 style="margin: 0 0 0.5rem; color: var(--danger);">Error Details:</h4>
+                    <pre style="
+                        color: var(--gray);
+                        font-family: 'Monaco', 'Courier New', monospace;
+                        font-size: 0.9rem;
+                        margin: 0;
+                        white-space: pre-wrap;
+                        word-wrap: break-word;
+                    "><%= error %></pre>
+                </div>
+            <% } %>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                <a href="/" class="btn btn-primary">← Back to Home</a>
+                <button onclick="location.reload()" class="btn btn-secondary">🔄 Try Again</button>
+            </div>
+            
+            <div style="margin-top: 3rem;">
+                <p style="color: var(--gray);">
+                    If the problem persists, please 
+                    <a href="/" style="color: var(--primary);">contact support</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
